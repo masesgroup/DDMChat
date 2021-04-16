@@ -1,0 +1,57 @@
+﻿<Window x:Class="MASES.S4I.ChatUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MASES.S4I.ChatUI"
+        mc:Ignorable="d"
+        Title="DDM Chat" Height="350" Width="525">
+    <DockPanel LastChildFill="True">
+        <DockPanel DockPanel.Dock="Bottom">
+            <Expander ExpandDirection="Down" Header="{Binding CommunicationState}">
+                <TextBlock TextWrapping="Wrap" Text="{Binding CommunicationStateDescription}"></TextBlock>
+            </Expander>
+        </DockPanel>
+        <DockPanel LastChildFill="True" DockPanel.Dock="Top">
+            <DockPanel DockPanel.Dock="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Button Click="Configure_button_click" Width="26" Height="26" BorderThickness="0" Margin="3">
+                        <Button.Background>
+                            <ImageBrush ImageSource="settings.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
+                    <ComboBox Name="ComboType" Width="100" Margin="3,2"></ComboBox>
+                    <CheckBox Content="Start Server" IsChecked="{Binding StartServer}" VerticalAlignment="Center" Margin="3,2"></CheckBox>
+                    <Button Content="Connect" Click="Connect" VerticalAlignment="Center" Margin="3,2"/>
+                    <Button Content="Disconnect" Click="Disconnect" VerticalAlignment="Center" Margin="3,2"/>
+                </StackPanel>
+            </DockPanel>
+            <DockPanel DockPanel.Dock="left">
+                <GroupBox Header="Send Encrypted to:">
+                    <StackPanel>
+                        <CheckBox Content="Select All" Checked="SelectAll_Checked" Unchecked="SelectAll_Unchecked" Margin="3,2"/>
+                        <ListView x:Name="Contacts" Margin="5,5,5,5" Width="150">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox IsChecked="{Binding Selected}" />
+                                        <TextBlock Text="{Binding Name}"  Margin="2"/>
+                                        <TextBlock Text="{Binding LastName}"  Margin="2"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </StackPanel>
+                </GroupBox>
+            </DockPanel>
+
+            <DockPanel>
+                <DockPanel DockPanel.Dock="Bottom"  HorizontalAlignment="Stretch">
+                    <Button Content="Send" Click="Send" DockPanel.Dock="Right" Background="#FF3DCD12"/>
+                    <TextBox Name="MessageText" Text="write a message" DockPanel.Dock="Left" KeyDown="MessageText_KeyDown"></TextBox>
+                </DockPanel>
+                <TextBox Text="{Binding TextArea}" TextAlignment="Left"></TextBox>
+            </DockPanel>
+        </DockPanel>
+    </DockPanel>
+</Window>
