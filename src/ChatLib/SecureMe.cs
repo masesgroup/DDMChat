@@ -139,6 +139,20 @@ namespace MASES.S4I.ChatLib
             return Encoding.ASCII.GetBytes(plaintext);
         }
 
+        internal byte[] Sign(string jsonMessage)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(jsonMessage);
+            return rsa.SignData(data, HashAlgorithmName.MD5, RSASignaturePadding.Pkcs1);
+
+        }
+
+        internal bool Verify(string jsonMessage, byte[] signature, string publicKey)
+        {
+            var localRsa = RSA.Create();
+            localRsa.FromXmlString(publicKey);
+            byte[] data = Encoding.ASCII.GetBytes(jsonMessage);
+            return localRsa.VerifyData(data, signature, HashAlgorithmName.MD5, RSASignaturePadding.Pkcs1);
+        }
     }
 
     public class EncryptedMessage

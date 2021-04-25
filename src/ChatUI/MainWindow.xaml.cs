@@ -163,11 +163,12 @@ namespace MASES.S4I.ChatUI
                     }
                     ChatUser cu = book.RetrieveUser(decoded.Sender);
                     displayName = (cu != null) ? cu.Name + " " + cu.LastName : decoded.Sender.GetHashCode().ToString();
+                    string verified = (decoded.Verified) ? "V+" : "!?";
 
                     if (received)
-                        TextArea += string.Format("{0}-{1}>> {2}{3}", e.Timestamp, displayName, decoded.StringContent, Environment.NewLine);
+                        TextArea += string.Format("{0} {1}-{2}>> {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
                     else
-                        TextArea += string.Format("{0}-{1}-- {2}{3}", e.Timestamp, displayName, decoded.StringContent, Environment.NewLine);
+                        TextArea += string.Format("{0} {1}-{2}-- {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
                 });
             }
         }
@@ -264,21 +265,27 @@ namespace MASES.S4I.ChatUI
                     Kind = MessageKindType.STRING,
                     StringContent = MessageText.Text
                 };
-                if (selectedToSend.Count == 0) messageModule.SendMessage<string>(textMessage.ToJson());
+                if (selectedToSend.Count == 0)
+                {
+                    SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                    messageModule.SendMessage<string>(signedTextMessage.ToJson());
+                }
                 else
                 {
                     bool sentToMyself = false;
                     foreach (ChatUser cu in selectedToSend)
                     {
                         textMessage.Destination = cu.Sender;
-                        messageModule.SendMessage<string>(textMessage.ToJson());
+                        SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                        messageModule.SendMessage<string>(signedTextMessage.ToJson());
                         if (cu.Sender == UserProfile.Sender) sentToMyself = true;
                     }
                     if (!sentToMyself)
                     {
                         //send always a copy of the encrypted message to myself
                         textMessage.Destination = UserProfile.Sender;
-                        messageModule.SendMessage<string>(textMessage.ToJson());
+                        SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                        messageModule.SendMessage<string>(signedTextMessage.ToJson());
                     }
                 }
                 MessageText.Text = string.Empty;
@@ -326,7 +333,8 @@ namespace MASES.S4I.ChatUI
             {
                 UserProfile.Destination = cu.Sender;
             }
-            userModule.SendMessage<string>(UserProfile.ToJson(), messageModule.Id.ToString());
+            SignedMessage signedUserProfileMessage = new SignedMessage(UserProfile.ToJson());
+            userModule.SendMessage<string>(signedUserProfileMessage.ToJson(), messageModule.Id.ToString());
         }
 
         /// <summary>
