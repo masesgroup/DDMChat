@@ -104,6 +104,43 @@ namespace MASES.S4I.ChatLib
         }
     }
 
+
+    public class SignedMessage
+    {
+        public byte[] Signature;
+        public string JsonMessage;
+
+        public SignedMessage(string jsonMessage)
+        {
+            JsonMessage = jsonMessage;
+            Signature = new SecureMe().Sign(JsonMessage);
+        }
+
+        public string ToJson()
+        {
+            return JsonConvert.SerializeObject(this);
+        }
+
+        public static SignedMessage FromJson(string str)
+        {
+            try
+            {
+                var res = JsonConvert.DeserializeObject<SignedMessage>(str);
+                return res;
+            }
+            catch
+            {
+                // unable to decode to a SignedMessage
+                return null;
+            }
+        }
+
+        public static bool Verify(SignedMessage sm, string publicKey)
+        {
+            return new SecureMe().Verify(sm.JsonMessage, sm.Signature, publicKey);
+        }
+    }
+
     public class Message
     {
         AddressBook book = new AddressBook();
@@ -113,6 +150,7 @@ namespace MASES.S4I.ChatLib
         public MessageKindType Kind;
         public string StringContent;
         public EncryptedMessage DataContent;
+        public bool Verified;
 
         public Message()
         {
@@ -158,7 +196,19 @@ namespace MASES.S4I.ChatLib
 
         public static Message FromJson(string str)
         {
+            SignedMessage sm = SignedMessage.FromJson(str);
+            // if the message is a signed message decode the contained json
+            if (sm != null)
+            {
+                str = sm.JsonMessage;
+                Message deserialized = FromJson(str);
+                ChatUser from = new AddressBook().RetrieveUser(deserialized.Sender);
+                deserialized.Verified = (from != null && SignedMessage.Verify(sm, from.PublicKey));
+                return deserialized;
+            }
+
             var res = JsonConvert.DeserializeObject<Message>(str);
+            res.Verified = false;
             switch (res.Kind)
             {
                 case MessageKindType.STRING:
@@ -188,6 +238,8 @@ namespace MASES.S4I.ChatLib
                         var res2 = FromJson(Encoding.ASCII.GetString(new SecureMe().DecryptMessage(res.DataContent)));
                         //restore destination from envelop 
                         res2.Destination = res.Destination;
+                        //restore verified from envelop
+                        res2.Verified = res.Verified;
                         return res2;
                     }
                 default: throw new InvalidOperationException(string.Format("Unrecognized message type {0}", res.Kind));
