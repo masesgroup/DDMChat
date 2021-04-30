@@ -29,6 +29,7 @@ namespace MASES.S4I.ChatLib
     {
         public const string publicKeyFile = "pub.key";
         public const string privateKeyFile = "private.key";
+        public const string contactsFile = "contacts.json";
         public const int keySize = 2048;
     }
 }

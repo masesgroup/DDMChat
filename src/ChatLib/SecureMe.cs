@@ -34,6 +34,10 @@ namespace MASES.S4I.ChatLib
         RSA rsa = RSA.Create(Constants.keySize);
         AesManaged aes = new AesManaged();
 
+        /// <summary>
+        /// Constructor
+        /// Verify the existence of a private key or create a new one
+        /// </summary>
         public SecureMe()
         {
             //aes.Padding = PaddingMode.PKCS7;
@@ -48,6 +52,9 @@ namespace MASES.S4I.ChatLib
             }
         }
 
+        /// <summary>
+        /// Return the AES IV parameter in unse
+        /// </summary>
         public byte[] AesIV
         {
             get
@@ -56,6 +63,9 @@ namespace MASES.S4I.ChatLib
             }
         }
 
+        /// <summary>
+        /// Return the AES Key parameter in unse
+        /// </summary>
         public byte[] AesKey
         {
             get
@@ -64,6 +74,9 @@ namespace MASES.S4I.ChatLib
             }
         }
 
+        /// <summary>
+        /// Return the public key in use
+        /// </summary>
         public string PublicKey
         {
             get
@@ -72,6 +85,12 @@ namespace MASES.S4I.ChatLib
             }
         }
 
+        /// <summary>
+        /// Encript a message using the passed public key
+        /// </summary>
+        /// <param name="publicKey">public key to be used to encrypt</param>
+        /// <param name="message">message to be encrypted</param>
+        /// <returns>The encrypted message</returns>
         public byte[] Encrypt(string publicKey, byte[] message)
         {
             var localRsa = RSA.Create();
@@ -79,6 +98,11 @@ namespace MASES.S4I.ChatLib
             return localRsa.Encrypt(message, RSAEncryptionPadding.Pkcs1);
         }
 
+        /// <summary>
+        /// Decrypt a message using the stored private key
+        /// </summary>
+        /// <param name="message">encrypted message to be decrypted</param>
+        /// <returns>the decrypted message</returns>
         public byte[] Decrypt(byte[] message)
         {
             byte[] res = null;
@@ -90,6 +114,16 @@ namespace MASES.S4I.ChatLib
             return res;
         }
 
+        /// <summary>
+        /// Encrypt a message using the passed public key
+        /// the public key is used to encrypt the AES keys
+        /// newly generated AES keys are used every time
+        /// the message is crypted using AES
+        /// </summary>
+        /// <param name="publicKey">the public key used to encrypt AES keys</param>
+        /// <param name="message">the message to be encrypted with AES</param>
+        /// <returns>An <see cref="EncryptedMessage"/> 
+        /// containig the encrypted AES keys and the message encrypted with these keys</returns>
         public EncryptedMessage EncryptMessage(string publicKey, byte[] message)
         {
             byte[] encrypted;
@@ -114,6 +148,11 @@ namespace MASES.S4I.ChatLib
             };
         }
 
+        /// <summary>
+        /// Decrypta the message contained in an <see cref="EncryptedMessage"/> instance
+        /// </summary>
+        /// <param name="message">the <see cref="EncryptedMessage"/> message to be decrypted</param>
+        /// <returns></returns>
         public byte[] DecryptMessage(EncryptedMessage message)
         {
 
@@ -155,6 +194,9 @@ namespace MASES.S4I.ChatLib
         }
     }
 
+    /// <summary>
+    /// Class to contain the encrypted messages
+    /// </summary>
     public class EncryptedMessage
     {
         public byte[] DataContent;

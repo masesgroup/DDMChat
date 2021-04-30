@@ -229,6 +229,7 @@ namespace MASES.S4I.ChatUI
 
         public MainWindow()
         {
+            book.Load();
             InitializeComponent();
             comModules = new CommunicationModule[] { userModule, messageModule };
             foreach (var comModule in comModules)
