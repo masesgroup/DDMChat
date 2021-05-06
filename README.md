@@ -13,10 +13,10 @@ All messages are encoded in json.
 In the src/ folder there are all Visual Studio projects and the complete solution. Projects are designed to be a base for other projects. ChatUi is the GUI frontend based on ChatLib and CommunicationLib, but CLI, or other user interfaces, can be easly implemented on top of these two libraries. 
 
 ### CommunicationLib
-It Contains classes dedicated to the [DataDistributionManager](https://github.com/masesgroup/DataDistributionManager) management and exposes the ICommunication interface to simplify the communication processes.
+It contains classes dedicated to the [DataDistributionManager](https://github.com/masesgroup/DataDistributionManager) management and exposes the ICommunication interface to simplify the communication processes.
 
 ### ChatLib
-It Contains classes for messages and encryption management.
+It contains classes for messages and encryption management.
 The following messages types are implemented:
 - STRING
 - USER
@@ -33,7 +33,7 @@ It is the Chat User interface and implements the following features:
 - allows to send and receive encrypted messages
 - display communication status and errors 
 - features a volatile chat board and user list.
-- Is supports the following messages:
+- it supports the following messages:
   - STRING
   - USER
   - ENCRYPTED
