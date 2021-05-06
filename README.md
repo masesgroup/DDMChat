@@ -1,6 +1,6 @@
 ![DDMChat logo](./images/logo.png)
 # DDMChat - DataDistributionManager Kafka and OpenDDS chat
-__Ver 0.5.0.0__
+__Ver 0.6.0.0__
 **DDMChat** is a chat software based on the [DataDistributionManager](https://github.com/masesgroup/DataDistributionManager) project that can use **Kafka** and **OpenDDS** as communication channel.
 Similar to a Bullettin Board System every chat client writes messages in plain text to the communication channel and every other client can read it, but messages can also be addressed to single users. Messages addressed to specific users are **encrypted** using **symmetric** and **asymmetric** encryption, and they are encapsulated on a plain message envelop.  
 
@@ -13,10 +13,10 @@ All messages are encoded in json.
 In the src/ folder there are all Visual Studio projects and the complete solution. Projects are designed to be a base for other projects. ChatUi is the GUI frontend based on ChatLib and CommunicationLib, but CLI, or other user interfaces, can be easly implemented on top of these two libraries. 
 
 ### CommunicationLib
-It Contains classes dedicated to the [DataDistributionManager](https://github.com/masesgroup/DataDistributionManager) management and exposes the ICommunication interface to simplify the communication processes.
+It contains classes dedicated to the [DataDistributionManager](https://github.com/masesgroup/DataDistributionManager) management and exposes the ICommunication interface to simplify the communication processes.
 
 ### ChatLib
-It Contains classes for messages and encryption management.
+It contains classes for messages and encryption management.
 The following messages types are implemented:
 - STRING
 - USER
@@ -33,16 +33,17 @@ It is the Chat User interface and implements the following features:
 - allows to send and receive encrypted messages
 - display communication status and errors 
 - features a volatile chat board and user list.
-- Is supports the following messages:
+- it supports the following messages:
   - STRING
   - USER
   - ENCRYPTED
 
+  
 ## Future developments
-This is the first public version of this project, more work shall be done to extend the configuration features and, on the user interface, to better manange message visualization on the message visualization area. 
-Signing of every sent message, also plain text one can be auspicable in the near future, at the same time, user online status and persistence of the Contact list can be taken in account.
-Improvement are needed on the channels management to take advanteges of the kafka and OpenDDS topic history.
-Last but not least still be managed the sending of audio, vidio, images, files and urls.
+This is the first public version of this project, more work shall be done to extend the configuration features and, on the user interface, to better manage message visualization on the message visualization area. 
+Users online status should be taken in account.
+Improvements are needed on the channels management to take advanteges of the kafka and OpenDDS topic history.
+Last but not least still be managed the sending of audios, videos, images, files and urls.
 
-Take a look at the issue section for requested fearures: **contributors are welcome**.
+Take a look at the issue section for requested features: **contributors are welcome**.
 

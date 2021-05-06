@@ -161,14 +161,17 @@ namespace MASES.S4I.ChatUI
                             }
                         }
                     }
-                    ChatUser cu = book.RetrieveUser(decoded.Sender);
-                    displayName = (cu != null) ? cu.Name + " " + cu.LastName : decoded.Sender.GetHashCode().ToString();
-                    string verified = (decoded.Verified) ? "V+" : "!?";
-
-                    if (received)
-                        TextArea += string.Format("{0} {1}-{2}>> {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
                     else
-                        TextArea += string.Format("{0} {1}-{2}-- {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
+                    {
+                        ChatUser cu = book.RetrieveUser(decoded.Sender);
+                        displayName = (cu != null) ? cu.Name + " " + cu.LastName : decoded.Sender.GetHashCode().ToString();
+                        string verified = (decoded.Verified) ? "V+" : "!?";
+
+                        if (received)
+                            TextArea += string.Format("{0} {1}-{2}>> {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
+                        else
+                            TextArea += string.Format("{0} {1}-{2}-- {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
+                    }
                 });
             }
         }
@@ -224,7 +227,6 @@ namespace MASES.S4I.ChatUI
                 configurationWin.ShowDialog();
             }
             base.OnActivated(e);
-
         }
 
         public MainWindow()
@@ -402,12 +404,12 @@ namespace MASES.S4I.ChatUI
                     };
                     KafkaChannelConfiguration kChannelConfiguration = new KafkaChannelConfiguration(kConfiguration)
                     {
-                        //AutoOffsetReset = (cm.ChannelName == "users") ? AutoOffsetResetType.beginning: AutoOffsetResetType.latest,
+                        AutoOffsetReset = (cm.ChannelName == "users") ? AutoOffsetResetType.beginning : AutoOffsetResetType.latest,
+                        InitialOffset = (cm.ChannelName == "users") ? InitialOffsetTypes.Beginning : InitialOffsetTypes.Stored,
                         ClientId = "chat" + cm.ChannelName + cm.Id.ToString(),
                         GroupId = "chatGrp" + cm.Id.ToString(),
                         BootstrapBrokers = "206.189.214.143:9093",
                     };
-                    if (cm.ChannelName == "users") kChannelConfiguration[KafkaConfigurationType.TOPIC_CONF, "datadistributionmanager.kafka.topicconf.auto.offset.reset"] = "beginning";
                     conf = kChannelConfiguration;
                     break;
             }

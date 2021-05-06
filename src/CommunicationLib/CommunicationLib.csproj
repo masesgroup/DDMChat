@@ -34,8 +34,8 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DataDistributionManagerNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a3710324e67e8743, processorArchitecture=MSIL">
-      <HintPath>..\packages\DataDistributionManager.1.1.1\lib\net461\DataDistributionManagerNet.dll</HintPath>
+    <Reference Include="DataDistributionManagerNet">
+      <HintPath>..\packages\DataDistributionManager.1.1.2\lib\net461\DataDistributionManagerNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -60,15 +60,17 @@
     <Content Include="dds_tcp_conf.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\DataDistributionManager.1.1.1\build\datadistributionmanager.targets" Condition="Exists('..\packages\DataDistributionManager.1.1.1\build\datadistributionmanager.targets')" />
+  <Import Project="..\packages\DataDistributionManager.1.1.2\build\datadistributionmanager.targets" Condition="Exists('..\packages\DataDistributionManager.1.1.2\build\datadistributionmanager.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Questo progetto fa riferimento a uno o più pacchetti NuGet che non sono presenti in questo computer. Usare lo strumento di ripristino dei pacchetti NuGet per scaricarli. Per altre informazioni, vedere http://go.microsoft.com/fwlink/?LinkID=322105. Il file mancante è {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\DataDistributionManager.1.1.1\build\datadistributionmanager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DataDistributionManager.1.1.1\build\datadistributionmanager.targets'))" />
+    <Error Condition="!Exists('..\packages\DataDistributionManager.1.1.2\build\datadistributionmanager.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\DataDistributionManager.1.1.2\build\datadistributionmanager.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
