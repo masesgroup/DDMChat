@@ -1,6 +1,6 @@
 ![DDMChat logo](./images/logo.png)
 # DDMChat - DataDistributionManager Kafka and OpenDDS chat
-__Ver 0.5.0.0__
+__Ver 0.6.0.0__
 **DDMChat** is a chat software based on the [DataDistributionManager](https://github.com/masesgroup/DataDistributionManager) project that can use **Kafka** and **OpenDDS** as communication channel.
 Similar to a Bullettin Board System every chat client writes messages in plain text to the communication channel and every other client can read it, but messages can also be addressed to single users. Messages addressed to specific users are **encrypted** using **symmetric** and **asymmetric** encryption, and they are encapsulated on a plain message envelop.  
 
@@ -38,11 +38,12 @@ It is the Chat User interface and implements the following features:
   - USER
   - ENCRYPTED
 
+  
 ## Future developments
-This is the first public version of this project, more work shall be done to extend the configuration features and, on the user interface, to better manange message visualization on the message visualization area. 
-Signing of every sent message, also plain text one can be auspicable in the near future, at the same time, user online status and persistence of the Contact list can be taken in account.
-Improvement are needed on the channels management to take advanteges of the kafka and OpenDDS topic history.
-Last but not least still be managed the sending of audio, vidio, images, files and urls.
+This is the first public version of this project, more work shall be done to extend the configuration features and, on the user interface, to better manage message visualization on the message visualization area. 
+Users online status should be taken in account.
+Improvements are needed on the channels management to take advanteges of the kafka and OpenDDS topic history.
+Last but not least still be managed the sending of audios, videos, images, files and urls.
 
-Take a look at the issue section for requested fearures: **contributors are welcome**.
+Take a look at the issue section for requested features: **contributors are welcome**.
 
