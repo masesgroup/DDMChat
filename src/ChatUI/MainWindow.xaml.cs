@@ -32,6 +32,7 @@ using MASES.DataDistributionManager.Bindings;
 using MASES.DataDistributionManager.Bindings.Configuration;
 using MASES.S4I.ChatLib;
 using System.IO;
+using System.Windows.Controls;
 #if NET
 using System.Windows.Forms;
 #else
@@ -59,7 +60,8 @@ namespace MASES.S4I.ChatUI
 #endregion private
 
 #region public
-        public AddressBook book = new AddressBook();
+        public AddressBook Book = new AddressBook();
+        public ReceivedMessages MessageList = new ReceivedMessages();
 #endregion public
 
 #region DependencyProperty
@@ -105,16 +107,28 @@ namespace MASES.S4I.ChatUI
             DependencyProperty.Register("StartServer", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
 
 
-
         public bool UploadReady
         {
             get { return (bool)GetValue(UploadReadyProperty); }
             set { SetValue(UploadReadyProperty, value); }
         }
 
+
         // Using a DependencyProperty as the backing store for UploadReady.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty UploadReadyProperty =
             DependencyProperty.Register("UploadReady", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
+
+        public string UploadName
+        {
+            get { return (string)GetValue(UploadNameProperty); }
+            set { SetValue(UploadNameProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for UploadName.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UploadNameProperty =
+            DependencyProperty.Register("UploadName", typeof(string), typeof(MainWindow), new PropertyMetadata(string.Empty));
 
 
         #endregion DependencyProperty
@@ -175,7 +189,7 @@ namespace MASES.S4I.ChatUI
                     {
                         if (decoded.Kind == MessageKindType.USER)
                         {
-                            if (book.Add(decoded.Sender, (decoded as ChatUser)) &&
+                            if (Book.Add(decoded.Sender, (decoded as ChatUser)) &&
                                (decoded as ChatUser).Sender != UserProfile.Sender)
                             {
                                 HelloMessage(decoded as ChatUser);
@@ -184,7 +198,7 @@ namespace MASES.S4I.ChatUI
                     }
                     else
                     {
-                        ChatUser cu = book.RetrieveUser(decoded.Sender);
+                        ChatUser cu = Book.RetrieveUser(decoded.Sender);
                         displayName = (cu != null) ? cu.Name + " " + cu.LastName : decoded.Sender.GetHashCode().ToString();
                         string verified = (decoded.Verified) ? "V+" : "!?";
 
@@ -192,6 +206,11 @@ namespace MASES.S4I.ChatUI
                             TextArea += string.Format("{0} {1}-{2}>> {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
                         else
                             TextArea += string.Format("{0} {1}-{2}-- {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
+                        if(cu == null)
+                        {
+                            cu = new ChatUser() { Name = decoded.Sender.GetHashCode().ToString(), LastName = string.Empty };
+                        }
+                        MessageList.Add(decoded, cu, received);
                     }
                 });
             }
@@ -252,7 +271,7 @@ namespace MASES.S4I.ChatUI
 
         public MainWindow()
         {
-            book.Load();
+            Book.Load();
             InitializeComponent();
             comModules = new CommunicationModule[] { userModule, messageModule };
             foreach (var comModule in comModules)
@@ -263,7 +282,8 @@ namespace MASES.S4I.ChatUI
             DataContext = this;
             ComboType.ItemsSource = new string[] { "Kafka", "OpenDDS" };
             ComboType.SelectedIndex = 0;
-            Contacts.ItemsSource = book.UserList;
+            Contacts.ItemsSource = Book.UserList;
+            Messages.ItemsSource = MessageList.MessageList;
         }
 #endregion window
 
@@ -276,7 +296,7 @@ namespace MASES.S4I.ChatUI
         private void Send(object sender, RoutedEventArgs e)
         {
             List<ChatUser> selectedToSend = new List<ChatUser>();
-            foreach (ChatUser cu in book.UserList)
+            foreach (ChatUser cu in Book.UserList)
             {
                 if (cu.Selected) selectedToSend.Add(cu);
             }
@@ -325,12 +345,14 @@ namespace MASES.S4I.ChatUI
                     }
                 }
                 MessageText.Text = string.Empty;
+                Uploaded = null;
+                UploadReady = false;
             });
         }
 
         private void SelectAll_Checked(object sender, RoutedEventArgs e)
         {
-            foreach (ChatUser cu in book.UserList)
+            foreach (ChatUser cu in Book.UserList)
             {
                 cu.Selected = true;
             }
@@ -338,7 +360,7 @@ namespace MASES.S4I.ChatUI
 
         private void SelectAll_Unchecked(object sender, RoutedEventArgs e)
         {
-            foreach (ChatUser cu in book.UserList)
+            foreach (ChatUser cu in Book.UserList)
             {
                 cu.Selected = false;
             }
@@ -397,6 +419,7 @@ namespace MASES.S4I.ChatUI
                         Uploaded = new ChatFile();
                         Uploaded.Name = Path.GetFileName(openFileDialog.FileName);
                         Uploaded.Kind = MessageKindType.FILE;
+                        UploadName = Uploaded.Name;
                         //Uploaded.Description updated on send
                         Uploaded.FileContent = new ChatFileContent()
                         {
@@ -411,6 +434,7 @@ namespace MASES.S4I.ChatUI
                     MessageBox.Show(ex.Message,"Unable to load file");
                     Uploaded = null;
                     UploadReady = false;
+                    UploadName = string.Empty;
                 }
             }
         }
@@ -424,6 +448,32 @@ namespace MASES.S4I.ChatUI
         {
             Uploaded = null;
             UploadReady = false;
+        }
+
+        /// <summary>
+        /// Manage download request
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Download(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Button btn = sender as Button;
+                int idx = (int)btn.Tag;
+                SaveFileDialog sfv = new SaveFileDialog();
+                sfv.FileName = MessageList.MessageList[idx].FileName;
+
+                if (sfv.ShowDialog() == true)
+                {
+                    File.WriteAllBytes(sfv.FileName, MessageList.MessageList[idx].File.Content);
+                }
+                Console.WriteLine(sender.ToString());
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Unable to save file");
+            }
         }
 
         #endregion UIevents
@@ -514,6 +564,7 @@ namespace MASES.S4I.ChatUI
             }
             return conf;
         }
+
         #endregion privateMethods
 
         

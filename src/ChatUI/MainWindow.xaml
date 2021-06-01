@@ -49,9 +49,9 @@
             </DockPanel>
 
             <DockPanel>
-                
+
                 <DockPanel DockPanel.Dock="Bottom"  HorizontalAlignment="Stretch">
-                    <Grid DockPanel.Dock="Top" Visibility="{Binding UploadReady,Converter={StaticResource b2v}}">
+                    <Grid DockPanel.Dock="Top" Visibility="{Binding UploadReady,Converter={StaticResource b2v}}" Background="AliceBlue">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"></ColumnDefinition>
                             <ColumnDefinition Width="50"></ColumnDefinition>
@@ -66,7 +66,7 @@
                             </Button.Background>
                         </Button>
                         <Image Grid.Column="1" Source="document.png" Stretch="Uniform"></Image>
-                        <Label Content="Filename.ext" Grid.Column="2"></Label>
+                        <Label Content="{Binding UploadName}" Grid.Column="2"></Label>
                     </Grid>
                     <Button Content="Send" Click="Send" DockPanel.Dock="Right" Background="#FF3DCD12"/>
                     <Button  Click="Upload" DockPanel.Dock="Left" Width="30">
@@ -76,7 +76,31 @@
                     </Button>
                     <TextBox Name="MessageText" Text="write a message" DockPanel.Dock="Left" KeyDown="MessageText_KeyDown"></TextBox>
                 </DockPanel>
-                <TextBox Text="{Binding TextArea}" TextAlignment="Left"></TextBox>
+                <!--TextBox Text="{Binding TextArea}" TextAlignment="Left"></-->
+                <ListView x:Name="Messages" Margin="5,5,5,5" HorizontalContentAlignment="Stretch">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="5">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="{Binding Alignment}" MaxWidth="300" Background="AliceBlue">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="encrypted.png" Width="15" Height="15" Visibility="{Binding Encrypted,Converter={StaticResource b2v}}"></Image>
+                                        <Image Source="verified.png" Width="15" Height="15" Visibility="{Binding Verified,Converter={StaticResource b2v}}"></Image>
+                                        <TextBlock Text="{Binding SenderName}" FontSize="8" Margin="2"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Visibility="{Binding HaveDownload,Converter={StaticResource b2v}}">
+                                        <Button   Tag="{Binding Idx}"  Width="30" Height="30" Click="Download">
+                                            <Button.Background>
+                                                <ImageBrush ImageSource="download.png" Stretch="Uniform"/>
+                                            </Button.Background>
+                                        </Button>
+                                        <Label Content="{Binding FileName}"></Label>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding StringContent}" TextWrapping="Wrap" FontWeight="DemiBold" Margin="2"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </DockPanel>
         </DockPanel>
     </DockPanel>
