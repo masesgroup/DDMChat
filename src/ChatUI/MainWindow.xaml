@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:MASES.S4I.ChatUI"
         mc:Ignorable="d"
         Title="DDM Chat" Height="350" Width="525">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="b2v" />
+    </Window.Resources>
     <DockPanel LastChildFill="True">
         <DockPanel DockPanel.Dock="Bottom">
             <Expander ExpandDirection="Down" Header="{Binding CommunicationState}">
@@ -46,8 +49,31 @@
             </DockPanel>
 
             <DockPanel>
+                
                 <DockPanel DockPanel.Dock="Bottom"  HorizontalAlignment="Stretch">
+                    <Grid DockPanel.Dock="Top" Visibility="{Binding UploadReady,Converter={StaticResource b2v}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                            <ColumnDefinition Width="50"></ColumnDefinition>
+                            <ColumnDefinition></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Button Grid.Column="0" Click="CancelUpload">
+                            <Button.Background>
+                                <ImageBrush ImageSource="remove.png" Stretch="Uniform"/>
+                            </Button.Background>
+                        </Button>
+                        <Image Grid.Column="1" Source="document.png" Stretch="Uniform"></Image>
+                        <Label Content="Filename.ext" Grid.Column="2"></Label>
+                    </Grid>
                     <Button Content="Send" Click="Send" DockPanel.Dock="Right" Background="#FF3DCD12"/>
+                    <Button  Click="Upload" DockPanel.Dock="Left" Width="30">
+                        <Button.Background>
+                            <ImageBrush ImageSource="attachment.png" Stretch="Uniform"/>
+                        </Button.Background>
+                    </Button>
                     <TextBox Name="MessageText" Text="write a message" DockPanel.Dock="Left" KeyDown="MessageText_KeyDown"></TextBox>
                 </DockPanel>
                 <TextBox Text="{Binding TextArea}" TextAlignment="Left"></TextBox>

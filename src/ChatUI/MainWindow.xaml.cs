@@ -31,6 +31,12 @@ using MASES.S4I.CommunicationLib;
 using MASES.DataDistributionManager.Bindings;
 using MASES.DataDistributionManager.Bindings.Configuration;
 using MASES.S4I.ChatLib;
+using System.IO;
+#if NET
+using System.Windows.Forms;
+#else
+using Microsoft.Win32;
+#endif
 
 namespace MASES.S4I.ChatUI
 {
@@ -42,20 +48,21 @@ namespace MASES.S4I.ChatUI
         //internal used by the configuration windows
         internal ChatUser UserProfile = null;
         internal Guid chatID = Guid.Empty;
+        internal ChatFile Uploaded = null;
 
-        #region private
+#region private
         ConfigurationWindow configurationWin;
         CommunicationModule messageModule = new CommunicationModule();
         CommunicationModule userModule = new CommunicationModule();
         CommunicationModule[] comModules;
         bool firstActivation = true;
-        #endregion private
+#endregion private
 
-        #region public
+#region public
         public AddressBook book = new AddressBook();
-        #endregion public
+#endregion public
 
-        #region DependencyProperty
+#region DependencyProperty
         public String CommunicationState
         {
             get { return (String)GetValue(CommunicationStateProperty); }
@@ -96,6 +103,20 @@ namespace MASES.S4I.ChatUI
         // Using a DependencyProperty as the backing store for StartServer.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartServerProperty =
             DependencyProperty.Register("StartServer", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
+
+        public bool UploadReady
+        {
+            get { return (bool)GetValue(UploadReadyProperty); }
+            set { SetValue(UploadReadyProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for UploadReady.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UploadReadyProperty =
+            DependencyProperty.Register("UploadReady", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
         #endregion DependencyProperty
 
         #region communicationLib
@@ -206,9 +227,9 @@ namespace MASES.S4I.ChatUI
                 HelloMessage();
             }
         }
-        #endregion communicationLib
+#endregion communicationLib
 
-        #region window
+#region window
         /// <summary>
         /// Open the setting window 
         /// </summary>
@@ -244,9 +265,9 @@ namespace MASES.S4I.ChatUI
             ComboType.SelectedIndex = 0;
             Contacts.ItemsSource = book.UserList;
         }
-        #endregion window
+#endregion window
 
-        #region UIevents
+#region UIevents
         /// <summary>
         /// Send message to the channel
         /// </summary>
@@ -262,15 +283,27 @@ namespace MASES.S4I.ChatUI
 
             this.Dispatcher.Invoke(() =>
             {
-                Message textMessage = new Message()
+                Message MessageToSend = null;
+                if (UploadReady)
                 {
-                    Sender = messageModule.Id,
-                    Kind = MessageKindType.STRING,
-                    StringContent = MessageText.Text
-                };
+                    //send the uploaded file with the text message
+                    MessageToSend = Uploaded;
+                    MessageToSend.Sender = messageModule.Id;
+                    MessageToSend.StringContent = MessageText.Text;
+                }
+                else
+                {
+                    //prepare a text message
+                    MessageToSend = new Message()
+                    {
+                        Sender = messageModule.Id,
+                        Kind = MessageKindType.STRING,
+                        StringContent = MessageText.Text
+                    };
+                }
                 if (selectedToSend.Count == 0)
                 {
-                    SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                    SignedMessage signedTextMessage = new SignedMessage(MessageToSend.ToJson());
                     messageModule.SendMessage<string>(signedTextMessage.ToJson());
                 }
                 else
@@ -278,16 +311,16 @@ namespace MASES.S4I.ChatUI
                     bool sentToMyself = false;
                     foreach (ChatUser cu in selectedToSend)
                     {
-                        textMessage.Destination = cu.Sender;
-                        SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                        MessageToSend.Destination = cu.Sender;
+                        SignedMessage signedTextMessage = new SignedMessage(MessageToSend.ToJson());
                         messageModule.SendMessage<string>(signedTextMessage.ToJson());
                         if (cu.Sender == UserProfile.Sender) sentToMyself = true;
                     }
                     if (!sentToMyself)
                     {
                         //send always a copy of the encrypted message to myself
-                        textMessage.Destination = UserProfile.Sender;
-                        SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                        MessageToSend.Destination = UserProfile.Sender;
+                        SignedMessage signedTextMessage = new SignedMessage(MessageToSend.ToJson());
                         messageModule.SendMessage<string>(signedTextMessage.ToJson());
                     }
                 }
@@ -327,6 +360,72 @@ namespace MASES.S4I.ChatUI
             configurationWin.Owner = this;
             configurationWin.ShowDialog();
         }
+
+        /// <summary>
+        /// Manage the selection of the file to be uploaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Upload(object sender, RoutedEventArgs e)
+        {
+            var fileContent = string.Empty;
+            var filePath = string.Empty;
+#if NET
+            using( OpenFileDialog openFileDialog = new OpenFileDialog())
+#else
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+#endif
+            {
+                try
+                {
+                    openFileDialog.InitialDirectory = Environment.CurrentDirectory;
+                    openFileDialog.Filter = "All files (*.*)|*.*";
+                    openFileDialog.FilterIndex = 1;
+                    openFileDialog.RestoreDirectory = true;
+#if NET
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+#else
+                    if (openFileDialog.ShowDialog() == true)
+#endif
+                    {
+                        //Get the path of specified file
+                        filePath = openFileDialog.FileName;
+
+                        //Read the contents of the file into a stream
+                        var fileStream = openFileDialog.OpenFile();
+
+                        Uploaded = new ChatFile();
+                        Uploaded.Name = Path.GetFileName(openFileDialog.FileName);
+                        Uploaded.Kind = MessageKindType.FILE;
+                        //Uploaded.Description updated on send
+                        Uploaded.FileContent = new ChatFileContent()
+                        {
+                            Content = File.ReadAllBytes(openFileDialog.FileName)
+                        };
+
+                    }
+                    UploadReady = true;
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message,"Unable to load file");
+                    Uploaded = null;
+                    UploadReady = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove an uploaded file 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CancelUpload(object sender, RoutedEventArgs e)
+        {
+            Uploaded = null;
+            UploadReady = false;
+        }
+
         #endregion UIevents
 
         #region privateMethods
@@ -416,5 +515,7 @@ namespace MASES.S4I.ChatUI
             return conf;
         }
         #endregion privateMethods
+
+        
     }
 }

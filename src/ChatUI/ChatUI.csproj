@@ -116,7 +116,10 @@
     <Resource Include="settings.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="remove.png" />
     <Resource Include="icon.ico" />
+    <Resource Include="attachment.png" />
+    <Resource Include="document.png" />
     <Content Include="profile.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
