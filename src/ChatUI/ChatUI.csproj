@@ -116,7 +116,13 @@
     <Resource Include="settings.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="verified.png" />
+    <Resource Include="remove.png" />
     <Resource Include="icon.ico" />
+    <Resource Include="attachment.png" />
+    <Resource Include="document.png" />
+    <Resource Include="download.png" />
+    <Resource Include="encrypted.png" />
     <Content Include="profile.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

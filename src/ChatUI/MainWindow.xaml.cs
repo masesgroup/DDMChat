@@ -31,6 +31,9 @@ using MASES.S4I.CommunicationLib;
 using MASES.DataDistributionManager.Bindings;
 using MASES.DataDistributionManager.Bindings.Configuration;
 using MASES.S4I.ChatLib;
+using System.IO;
+using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace MASES.S4I.ChatUI
 {
@@ -42,20 +45,22 @@ namespace MASES.S4I.ChatUI
         //internal used by the configuration windows
         internal ChatUser UserProfile = null;
         internal Guid chatID = Guid.Empty;
+        internal ChatFile Uploaded = null;
 
-        #region private
+#region private
         ConfigurationWindow configurationWin;
         CommunicationModule messageModule = new CommunicationModule();
         CommunicationModule userModule = new CommunicationModule();
         CommunicationModule[] comModules;
         bool firstActivation = true;
-        #endregion private
+#endregion private
 
-        #region public
-        public AddressBook book = new AddressBook();
-        #endregion public
+#region public
+        public AddressBook Book = new AddressBook();
+        public ReceivedMessages MessageList = new ReceivedMessages();
+#endregion public
 
-        #region DependencyProperty
+#region DependencyProperty
         public String CommunicationState
         {
             get { return (String)GetValue(CommunicationStateProperty); }
@@ -96,6 +101,32 @@ namespace MASES.S4I.ChatUI
         // Using a DependencyProperty as the backing store for StartServer.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty StartServerProperty =
             DependencyProperty.Register("StartServer", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
+        public bool UploadReady
+        {
+            get { return (bool)GetValue(UploadReadyProperty); }
+            set { SetValue(UploadReadyProperty, value); }
+        }
+
+
+        // Using a DependencyProperty as the backing store for UploadReady.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UploadReadyProperty =
+            DependencyProperty.Register("UploadReady", typeof(bool), typeof(MainWindow), new PropertyMetadata(false));
+
+
+
+        public string UploadName
+        {
+            get { return (string)GetValue(UploadNameProperty); }
+            set { SetValue(UploadNameProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for UploadName.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty UploadNameProperty =
+            DependencyProperty.Register("UploadName", typeof(string), typeof(MainWindow), new PropertyMetadata(string.Empty));
+
+
         #endregion DependencyProperty
 
         #region communicationLib
@@ -154,7 +185,7 @@ namespace MASES.S4I.ChatUI
                     {
                         if (decoded.Kind == MessageKindType.USER)
                         {
-                            if (book.Add(decoded.Sender, (decoded as ChatUser)) &&
+                            if (Book.Add(decoded.Sender, (decoded as ChatUser)) &&
                                (decoded as ChatUser).Sender != UserProfile.Sender)
                             {
                                 HelloMessage(decoded as ChatUser);
@@ -163,7 +194,7 @@ namespace MASES.S4I.ChatUI
                     }
                     else
                     {
-                        ChatUser cu = book.RetrieveUser(decoded.Sender);
+                        ChatUser cu = Book.RetrieveUser(decoded.Sender);
                         displayName = (cu != null) ? cu.Name + " " + cu.LastName : decoded.Sender.GetHashCode().ToString();
                         string verified = (decoded.Verified) ? "V+" : "!?";
 
@@ -171,6 +202,11 @@ namespace MASES.S4I.ChatUI
                             TextArea += string.Format("{0} {1}-{2}>> {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
                         else
                             TextArea += string.Format("{0} {1}-{2}-- {3}{4}", verified, e.Timestamp.ToShortTimeString(), displayName, decoded.StringContent, Environment.NewLine);
+                        if(cu == null)
+                        {
+                            cu = new ChatUser() { Name = decoded.Sender.GetHashCode().ToString(), LastName = string.Empty };
+                        }
+                        MessageList.Add(decoded, cu, received);
                     }
                 });
             }
@@ -206,9 +242,9 @@ namespace MASES.S4I.ChatUI
                 HelloMessage();
             }
         }
-        #endregion communicationLib
+#endregion communicationLib
 
-        #region window
+#region window
         /// <summary>
         /// Open the setting window 
         /// </summary>
@@ -231,7 +267,7 @@ namespace MASES.S4I.ChatUI
 
         public MainWindow()
         {
-            book.Load();
+            Book.Load();
             InitializeComponent();
             comModules = new CommunicationModule[] { userModule, messageModule };
             foreach (var comModule in comModules)
@@ -242,11 +278,12 @@ namespace MASES.S4I.ChatUI
             DataContext = this;
             ComboType.ItemsSource = new string[] { "Kafka", "OpenDDS" };
             ComboType.SelectedIndex = 0;
-            Contacts.ItemsSource = book.UserList;
+            Contacts.ItemsSource = Book.UserList;
+            Messages.ItemsSource = MessageList.MessageList;
         }
-        #endregion window
+#endregion window
 
-        #region UIevents
+#region UIevents
         /// <summary>
         /// Send message to the channel
         /// </summary>
@@ -255,22 +292,34 @@ namespace MASES.S4I.ChatUI
         private void Send(object sender, RoutedEventArgs e)
         {
             List<ChatUser> selectedToSend = new List<ChatUser>();
-            foreach (ChatUser cu in book.UserList)
+            foreach (ChatUser cu in Book.UserList)
             {
                 if (cu.Selected) selectedToSend.Add(cu);
             }
 
             this.Dispatcher.Invoke(() =>
             {
-                Message textMessage = new Message()
+                Message MessageToSend = null;
+                if (UploadReady)
                 {
-                    Sender = messageModule.Id,
-                    Kind = MessageKindType.STRING,
-                    StringContent = MessageText.Text
-                };
+                    //send the uploaded file with the text message
+                    MessageToSend = Uploaded;
+                    MessageToSend.Sender = messageModule.Id;
+                    MessageToSend.StringContent = MessageText.Text;
+                }
+                else
+                {
+                    //prepare a text message
+                    MessageToSend = new Message()
+                    {
+                        Sender = messageModule.Id,
+                        Kind = MessageKindType.STRING,
+                        StringContent = MessageText.Text
+                    };
+                }
                 if (selectedToSend.Count == 0)
                 {
-                    SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                    SignedMessage signedTextMessage = new SignedMessage(MessageToSend.ToJson());
                     messageModule.SendMessage<string>(signedTextMessage.ToJson());
                 }
                 else
@@ -278,26 +327,28 @@ namespace MASES.S4I.ChatUI
                     bool sentToMyself = false;
                     foreach (ChatUser cu in selectedToSend)
                     {
-                        textMessage.Destination = cu.Sender;
-                        SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                        MessageToSend.Destination = cu.Sender;
+                        SignedMessage signedTextMessage = new SignedMessage(MessageToSend.ToJson());
                         messageModule.SendMessage<string>(signedTextMessage.ToJson());
                         if (cu.Sender == UserProfile.Sender) sentToMyself = true;
                     }
                     if (!sentToMyself)
                     {
                         //send always a copy of the encrypted message to myself
-                        textMessage.Destination = UserProfile.Sender;
-                        SignedMessage signedTextMessage = new SignedMessage(textMessage.ToJson());
+                        MessageToSend.Destination = UserProfile.Sender;
+                        SignedMessage signedTextMessage = new SignedMessage(MessageToSend.ToJson());
                         messageModule.SendMessage<string>(signedTextMessage.ToJson());
                     }
                 }
                 MessageText.Text = string.Empty;
+                Uploaded = null;
+                UploadReady = false;
             });
         }
 
         private void SelectAll_Checked(object sender, RoutedEventArgs e)
         {
-            foreach (ChatUser cu in book.UserList)
+            foreach (ChatUser cu in Book.UserList)
             {
                 cu.Selected = true;
             }
@@ -305,7 +356,7 @@ namespace MASES.S4I.ChatUI
 
         private void SelectAll_Unchecked(object sender, RoutedEventArgs e)
         {
-            foreach (ChatUser cu in book.UserList)
+            foreach (ChatUser cu in Book.UserList)
             {
                 cu.Selected = false;
             }
@@ -327,6 +378,92 @@ namespace MASES.S4I.ChatUI
             configurationWin.Owner = this;
             configurationWin.ShowDialog();
         }
+
+        /// <summary>
+        /// Manage the selection of the file to be uploaded
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Upload(object sender, RoutedEventArgs e)
+        {
+            var fileContent = string.Empty;
+            var filePath = string.Empty;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            {
+                try
+                {
+                    openFileDialog.InitialDirectory = Environment.CurrentDirectory;
+                    openFileDialog.Filter = "All files (*.*)|*.*";
+                    openFileDialog.FilterIndex = 1;
+                    openFileDialog.RestoreDirectory = true;
+                    if (openFileDialog.ShowDialog() == true)
+                    {
+                        //Get the path of specified file
+                        filePath = openFileDialog.FileName;
+
+                        //Read the contents of the file into a stream
+                        var fileStream = openFileDialog.OpenFile();
+
+                        Uploaded = new ChatFile();
+                        Uploaded.Name = Path.GetFileName(openFileDialog.FileName);
+                        Uploaded.Kind = MessageKindType.FILE;
+                        UploadName = Uploaded.Name;
+                        //Uploaded.Description updated on send
+                        Uploaded.FileContent = new ChatFileContent()
+                        {
+                            Content = File.ReadAllBytes(openFileDialog.FileName)
+                        };
+
+                    }
+                    UploadReady = true;
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message,"Unable to load file");
+                    Uploaded = null;
+                    UploadReady = false;
+                    UploadName = string.Empty;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Remove an uploaded file 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CancelUpload(object sender, RoutedEventArgs e)
+        {
+            Uploaded = null;
+            UploadReady = false;
+        }
+
+        /// <summary>
+        /// Manage download request
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Download(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Button btn = sender as Button;
+                int idx = (int)btn.Tag;
+                SaveFileDialog sfv = new SaveFileDialog();
+                sfv.FileName = MessageList.MessageList[idx].FileName;
+
+                if (sfv.ShowDialog() == true)
+                {
+                    File.WriteAllBytes(sfv.FileName, MessageList.MessageList[idx].File.Content);
+                }
+                Console.WriteLine(sender.ToString());
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Unable to save file");
+            }
+        }
+
         #endregion UIevents
 
         #region privateMethods
