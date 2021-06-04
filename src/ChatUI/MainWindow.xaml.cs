@@ -33,11 +33,7 @@ using MASES.DataDistributionManager.Bindings.Configuration;
 using MASES.S4I.ChatLib;
 using System.IO;
 using System.Windows.Controls;
-#if NET
-using System.Windows.Forms;
-#else
 using Microsoft.Win32;
-#endif
 
 namespace MASES.S4I.ChatUI
 {
@@ -392,11 +388,7 @@ namespace MASES.S4I.ChatUI
         {
             var fileContent = string.Empty;
             var filePath = string.Empty;
-#if NET
-            using( OpenFileDialog openFileDialog = new OpenFileDialog())
-#else
             OpenFileDialog openFileDialog = new OpenFileDialog();
-#endif
             {
                 try
                 {
@@ -404,11 +396,7 @@ namespace MASES.S4I.ChatUI
                     openFileDialog.Filter = "All files (*.*)|*.*";
                     openFileDialog.FilterIndex = 1;
                     openFileDialog.RestoreDirectory = true;
-#if NET
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-#else
                     if (openFileDialog.ShowDialog() == true)
-#endif
                     {
                         //Get the path of specified file
                         filePath = openFileDialog.FileName;
@@ -564,9 +552,6 @@ namespace MASES.S4I.ChatUI
             }
             return conf;
         }
-
         #endregion privateMethods
-
-        
     }
 }
