@@ -43,9 +43,9 @@
     <Resource Include="download.png" />
     <Resource Include="encrypted.png" />
     <Resource Include="icon.ico" />
-    <Resource Include="profile.png">
+    <Content Include="profile.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    </Content>
     <Resource Include="remove.png" />
     <Resource Include="settings.png" />
     <Resource Include="verified.png" />
