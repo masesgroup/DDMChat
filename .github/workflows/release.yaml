@@ -1,0 +1,89 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI_RELEASE
+
+# Controls when the action will run. Triggers the workflow on release published or release edited request
+# events but only for the master branch
+on:
+  release:
+    types: 
+      - published
+      - edited
+
+jobs:
+  # This workflow contains a single job called "build_release"
+  build_release:
+    # The type of runner that the job will run on
+    runs-on: windows-2019
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Runs a set of commands using the runners shell
+      # Support longpaths
+      - name: Support long paths
+        run: git config --system core.longpaths true
+      
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it                                                                                  
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: set up msvc env
+        uses: ilammy/msvc-dev-cmd@v1.5.0
+      
+      - name: Build Common Tools
+        shell: cmd
+        run: |
+          cd third_party\CommonTools
+          msbuild -p:Configuration=Release,Platform="Any CPU" -m CommonTools.sln
+
+      - name: Extract commit SHA
+        run: |
+          echo "GITHUB_COMMIT_MESSAGE=$(echo $GITHUB_SHA)" >> $GITHUB_ENV
+        shell: bash
+       
+      - name: Prepare version
+        shell: cmd
+        run: |
+          cd third_party\CommonTools\Output
+          VersionGenerator %GITHUB_WORKSPACE%\src\ProductInformation\Version.cs %GITHUB_WORKSPACE%\src\ProductInformation ${{ env.GITHUB_COMMIT_MESSAGE }}
+        env:
+          GITHUB_WORKSPACE: $GITHUB_WORKSPACE
+
+      - name: Build Chat net4.7.2, net5.0 and netcoreapp3.1
+        run: |
+          dotnet build --no-incremental --configuration Release --framework netcoreapp3.1 -o Outputnetcoreapp31 src\ChatCore.sln
+          dotnet build --no-incremental --configuration Release --framework net5.0-windows -o Outputnet50 src\ChatCore.sln
+          dotnet build --no-incremental --configuration Release --framework net472 -o Outputnet472 src\ChatCore.sln
+
+      - name: Prepare for packaging
+        run: |
+          Compress-Archive -Path .\Outputnetcoreapp31\* -DestinationPath .\netcoreapp31.zip
+          Compress-Archive -Path .\Outputnet50\* -DestinationPath .\net50.zip
+          Compress-Archive -Path .\Outputnet472\* -DestinationPath .\net472.zip
+
+      - name: Upload netcoreapp31 Chat binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\netcoreapp31.zip
+          asset_name: netcoreapp31
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload net50 Chat binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\net50.zip
+          asset_name: net50
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload net472 Chat binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\net472.zip
+          asset_name: net472
+          tag: ${{ github.ref }}
+          overwrite: true
