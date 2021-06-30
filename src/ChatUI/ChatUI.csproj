@@ -46,6 +46,12 @@
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DataDistributionManagerNet, Version=1.0.0.0, Culture=neutral, PublicKeyToken=a3710324e67e8743, processorArchitecture=MSIL">
       <HintPath>..\packages\DataDistributionManager.1.1.2\lib\net461\DataDistributionManagerNet.dll</HintPath>
@@ -71,6 +77,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="..\ProductInformation\ComponentVersion.cs">
+      <Link>Properties\ComponentVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\ProductInformation\Version.cs">
+      <Link>Properties\Version.cs</Link>
+    </Compile>
     <Compile Include="VisualMessages.cs" />
     <Page Include="ConfigurationWindow.xaml">
       <SubType>Designer</SubType>
@@ -100,6 +112,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Common\Chat.snk">
+      <Link>Chat.snk</Link>
+    </None>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
