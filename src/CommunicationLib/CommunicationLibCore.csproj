@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFrameworks>net472;netcoreapp3.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.1;net5.0;net5.0-windows</TargetFrameworks>
     <RootNamespace>MASES.S4I.CommunicationLib</RootNamespace>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>CommunicationLib</AssemblyName>
+    <Authors>S4I s.r.l.</Authors>
+	<Version>__VERSION_PLACEHOLDER__</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ProductInformation\ComponentVersion.cs" Link="Properties\ComponentVersion.cs" />
