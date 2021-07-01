@@ -119,14 +119,10 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ChatLib.nupkg
-          path: .\src\ChatLib\bin\Release\*.nupkg
+          path: .\src\ChatLib\bin\Release\*nupkg
           
       - uses: actions/upload-artifact@v2
         with:
           name: CommunicationLib.nupkg
-          path: .\src\CommunicationLib\bin\Release\*.nupkg
+          path: .\src\CommunicationLib\bin\Release\*nupkg
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: ChatUI.nupkg
-          path: .\src\ChatUI\bin\Release\*.nupkg

@@ -115,12 +115,4 @@ jobs:
           asset_name: CommunicationLib.nupkg
           tag: ${{ github.ref }}
           overwrite: true
-          
-      - name: Upload ChatUI package to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: .\src\ChatUI\bin\Release\ChatUI.${{ env.NUGET_PACKAGE_VERSION }}.nupkg
-          asset_name: ChatUI.nupkg
-          tag: ${{ github.ref }}
-          overwrite: true
+

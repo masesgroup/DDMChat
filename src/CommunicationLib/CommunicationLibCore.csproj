@@ -1,30 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFrameworks>net472;netcoreapp3.1;net5.0;net5.0-windows</TargetFrameworks>
-    <RootNamespace>MASES.S4I.CommunicationLib</RootNamespace>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
-    <AssemblyName>CommunicationLib</AssemblyName>
-    <Authors>S4I s.r.l.</Authors>
-	<Version>__VERSION_PLACEHOLDER__</Version>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\ProductInformation\ComponentVersion.cs" Link="Properties\ComponentVersion.cs" />
-    <Compile Include="..\ProductInformation\Version.cs" Link="Properties\Version.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Common\Chat.snk" Link="Chat.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="DataDistributionManager" Version="1.1.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="dds_tcp_conf.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
+	<PropertyGroup>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<IncludeSymbols>true</IncludeSymbols>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<TargetFrameworks>net472;netcoreapp3.1;net5.0;net5.0-windows</TargetFrameworks>
+		<RootNamespace>MASES.S4I.CommunicationLib</RootNamespace>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
+		<AssemblyName>CommunicationLib</AssemblyName>
+		<Authors>S4I s.r.l.</Authors>
+		<Version>__VERSION_PLACEHOLDER__</Version>
+		<Title>DDMChat - CommunicationLib</Title>
+		<PackageDescription>A Kafka and OpenDDS chat based on the DataDistributionManager project, can use Kafka and OpenDDS as communication channel. Similar to a Bullettin Board System, every chat client writes messages in plain text to the communication channel, and every other client can read it, but messages can also be addressed to single users and encrypted using symmetric and asymmetric encryption.</PackageDescription>
+		<PackageLicenseUrl>https://github.com/masesgroup/DDMChat/blob/master/LICENSE</PackageLicenseUrl>
+		<PackageProjectUrl>https://github.com/masesgroup/DDMChat/</PackageProjectUrl>
+		<PackageIconUrl>https://github.com/mariomastrodicasa/DDMChat/blob/master/images/logo.png</PackageIconUrl>
+		<PackageReleaseNotes>https://github.com/masesgroup/DDMChat/releases</PackageReleaseNotes>
+		<PackageTags>chat bbc datadistributionmanager p2p</PackageTags>
+		<RepositoryUrl>https://github.com/masesgroup/DDMChat</RepositoryUrl>
+		<Copyright>Copyright © 2021 S4I s.r.l.</Copyright>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="..\ProductInformation\ComponentVersion.cs" Link="Properties\ComponentVersion.cs" />
+		<Compile Include="..\ProductInformation\Version.cs" Link="Properties\Version.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\Common\Chat.snk" Link="Chat.snk" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DataDistributionManager" Version="1.1.2" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="dds_tcp_conf.ini">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+	</ItemGroup>
 </Project>
