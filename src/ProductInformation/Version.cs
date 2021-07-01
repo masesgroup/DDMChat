@@ -29,6 +29,6 @@ static class VersionInfo
     public const string ProductCopyright = "Copyright © 2021 S4I s.r.l.";
     public const string Company = "S4I s.r.l.";
     public const string Trademark = "S4I s.r.l.";
-    public const string ProductCurrentMajorVersion = "0.6.0.0";
-    public const string ProductCurrentVersion = "0.6.0.0";
+    public const string ProductCurrentMajorVersion = "0.6.1.0";
+    public const string ProductCurrentVersion = "0.6.1.0";
 }
