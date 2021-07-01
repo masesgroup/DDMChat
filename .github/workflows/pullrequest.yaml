@@ -46,6 +46,13 @@ jobs:
           VersionGenerator %GITHUB_WORKSPACE%\src\ProductInformation\Version.cs %GITHUB_WORKSPACE%\src\ProductInformation ${{ env.GITHUB_COMMIT_MESSAGE }}
         env:
           GITHUB_WORKSPACE: $GITHUB_WORKSPACE
+          
+      - name: Prepare packaging versioning
+        shell: cmd
+        run: |
+          third_party\CommonTools\Output\PlaceHolderReplacer.exe .\src\ProductInformation\Version.cs .\src\ChatLib\ChatLibCore.csproj >> .\nuget_version.txt
+          third_party\CommonTools\Output\PlaceHolderReplacer.exe .\src\ProductInformation\Version.cs .\src\CommunicationLib\CommunicationLibCore.csproj
+          third_party\CommonTools\Output\PlaceHolderReplacer.exe .\src\ProductInformation\Version.cs .\src\ChatUI\ChatUICore.csproj
 
       - name: Build Chat net4.7.2, net5.0 and netcoreapp3.1
         run: |

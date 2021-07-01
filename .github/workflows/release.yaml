@@ -48,12 +48,22 @@ jobs:
           VersionGenerator %GITHUB_WORKSPACE%\src\ProductInformation\Version.cs %GITHUB_WORKSPACE%\src\ProductInformation ${{ env.GITHUB_COMMIT_MESSAGE }}
         env:
           GITHUB_WORKSPACE: $GITHUB_WORKSPACE
+          
+      - name: Prepare packaging versioning
+        shell: cmd
+        run: |
+          third_party\CommonTools\Output\PlaceHolderReplacer.exe .\src\ProductInformation\Version.cs .\src\ChatLib\ChatLibCore.csproj >> .\nuget_version.txt
+          third_party\CommonTools\Output\PlaceHolderReplacer.exe .\src\ProductInformation\Version.cs .\src\CommunicationLib\CommunicationLibCore.csproj
+          third_party\CommonTools\Output\PlaceHolderReplacer.exe .\src\ProductInformation\Version.cs .\src\ChatUI\ChatUICore.csproj
 
       - name: Build Chat net4.7.2, net5.0 and netcoreapp3.1
         run: |
           dotnet build --no-incremental --configuration Release /p:Platform="Any CPU" --framework netcoreapp3.1 -o Outputnetcoreapp31 src\ChatCore.sln
           dotnet build --no-incremental --configuration Release /p:Platform="Any CPU" --framework net5.0-windows -o Outputnet50 src\ChatCore.sln
           dotnet build --no-incremental --configuration Release /p:Platform="Any CPU" --framework net472 -o Outputnet472 src\ChatCore.sln
+
+      - name: Build Chat solution
+        run: dotnet build --no-incremental --configuration Release /p:Platform="Any CPU" src\ChatCore.sln
 
       - name: Prepare for packaging
         run: |
@@ -85,5 +95,32 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: .\net472.zip
           asset_name: net472
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload ChatLib package to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\src\ChatLib\bin\Release\ChatLib.${{ env.NUGET_PACKAGE_VERSION }}.nupkg
+          asset_name: ChatLib.nupkg
+          tag: ${{ github.ref }}
+          overwrite: true
+          
+      - name: Upload CommunicationLib package to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\src\CommunicationLib\bin\Release\CommunicationLib.${{ env.NUGET_PACKAGE_VERSION }}.nupkg
+          asset_name: CommunicationLib.nupkg
+          tag: ${{ github.ref }}
+          overwrite: true
+          
+      - name: Upload ChatUI package to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: .\src\ChatUI\bin\Release\ChatUI.${{ env.NUGET_PACKAGE_VERSION }}.nupkg
+          asset_name: ChatUI.nupkg
           tag: ${{ github.ref }}
           overwrite: true

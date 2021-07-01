@@ -8,6 +8,8 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
     <AssemblyName>ChatLib</AssemblyName>
+    <Authors>S4I s.r.l.</Authors>
+	<Version>__VERSION_PLACEHOLDER__</Version>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\ProductInformation\ComponentVersion.cs" Link="Properties\ComponentVersion.cs" />

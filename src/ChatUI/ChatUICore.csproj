@@ -11,6 +11,8 @@
     <AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
     <ApplicationIcon>icon.ico</ApplicationIcon>
     <AssemblyName>ChatUI</AssemblyName>
+    <Authors>S4I s.r.l.</Authors>
+	<Version>__VERSION_PLACEHOLDER__</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="attachment.png" />
