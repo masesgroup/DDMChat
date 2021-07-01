@@ -98,21 +98,13 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-      - name: Upload ChatLib package to release
-        uses: svenstaro/upload-release-action@v2
+      - uses: nuget/setup-nuget@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: .\src\ChatLib\bin\Release\ChatLib.${{ env.NUGET_PACKAGE_VERSION }}.nupkg
-          asset_name: ChatLib.nupkg
-          tag: ${{ github.ref }}
-          overwrite: true
-          
-      - name: Upload CommunicationLib package to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: .\src\CommunicationLib\bin\Release\CommunicationLib.${{ env.NUGET_PACKAGE_VERSION }}.nupkg
-          asset_name: CommunicationLib.nupkg
-          tag: ${{ github.ref }}
-          overwrite: true
+          nuget-version: '5.x'
 
+      - name: Publish to NuGet
+        run: |
+          nuget push .\src\ChatLib\bin\Release\*.nupkg -ApiKey ${{ secrets.DDMCHAT_NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+          nuget push .\src\ChatLib\bin\Release\*.snupkg -ApiKey ${{ secrets.DDMCHAT_NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+          nuget push .\src\CommunicationLib\bin\Release\*.nupkg -ApiKey ${{ secrets.DDMCHAT_NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
+          nuget push .\src\CommunicationLib\bin\Release\*.snupkg -ApiKey ${{ secrets.DDMCHAT_NUGET_API_KEY }} -Source https://api.nuget.org/v3/index.json -SkipDuplicate
