@@ -19,7 +19,7 @@
 		<PackageDescription>A Kafka and OpenDDS chat based on the DataDistributionManager project, can use Kafka and OpenDDS as communication channel. Similar to a Bullettin Board System, every chat client writes messages in plain text to the communication channel, and every other client can read it, but messages can also be addressed to single users and encrypted using symmetric and asymmetric encryption.</PackageDescription>
 		<PackageLicenseUrl>https://github.com/masesgroup/DDMChat/blob/master/LICENSE</PackageLicenseUrl>
 		<PackageProjectUrl>https://github.com/masesgroup/DDMChat/</PackageProjectUrl>
-		<PackageIconUrl>https://github.com/mariomastrodicasa/DDMChat/blob/master/images/logo.png</PackageIconUrl>
+		<PackageIconUrl>https://masesgroup.github.io/DDMChat/images/icon.ico</PackageIconUrl>
 		<PackageReleaseNotes>https://github.com/masesgroup/DDMChat/releases</PackageReleaseNotes>
 		<PackageTags>chat bbc datadistributionmanager p2p</PackageTags>
 		<RepositoryUrl>https://github.com/masesgroup/DDMChat</RepositoryUrl>
