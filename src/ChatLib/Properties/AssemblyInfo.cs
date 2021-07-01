@@ -24,7 +24,6 @@
 */
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // Le informazioni generali relative a un assembly sono controllate dal seguente 
@@ -32,12 +31,14 @@ using System.Runtime.InteropServices;
 // associate a un assembly.
 [assembly: AssemblyTitle("ChatLib")]
 [assembly: AssemblyDescription("ChatLib")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("S4I s.r.l.")]
-[assembly: AssemblyProduct("CommunicationLib")]
-[assembly: AssemblyCopyright("Copyright © 2021 S4I s.r.l.")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyInformationalVersion(ComponentVersionInfo.ComponentInformationalVersion)]
+[assembly: AssemblyCompany(VersionInfo.Company)]
+[assembly: AssemblyProduct(VersionInfo.ProductDescription)]
+[assembly: AssemblyCopyright(VersionInfo.ProductCopyright)]
+[assembly: AssemblyTrademark(VersionInfo.Trademark)]
 [assembly: AssemblyCulture("")]
+
+
 
 // Se si imposta ComVisible su false, i tipi in questo assembly non saranno visibili 
 // ai componenti COM. Se è necessario accedere a un tipo in questo assembly da 
@@ -57,5 +58,5 @@ using System.Runtime.InteropServices;
 // È possibile specificare tutti i valori oppure impostare valori predefiniti per i numeri relativi alla revisione e alla build 
 // usando l'asterisco '*' come illustrato di seguito:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.6.0.0")]
-[assembly: AssemblyFileVersion("0.6.0.0")]
+[assembly: AssemblyVersion(VersionInfo.ProductCurrentMajorVersion)]
+[assembly: AssemblyFileVersion(ComponentVersionInfo.ComponentVersion)]

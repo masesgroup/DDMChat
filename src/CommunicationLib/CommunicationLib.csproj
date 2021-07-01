@@ -33,6 +33,12 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\Common\Chat.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DataDistributionManagerNet">
       <HintPath>..\packages\DataDistributionManager.1.1.2\lib\net461\DataDistributionManagerNet.dll</HintPath>
@@ -48,6 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\ProductInformation\ComponentVersion.cs">
+      <Link>Properties\ComponentVersion.cs</Link>
+    </Compile>
+    <Compile Include="..\ProductInformation\Version.cs">
+      <Link>Properties\Version.cs</Link>
+    </Compile>
     <Compile Include="CommunicationModule.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="ExtendedStatus.cs" />
@@ -62,6 +74,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Common\Chat.snk">
+      <Link>Chat.snk</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
