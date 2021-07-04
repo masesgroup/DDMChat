@@ -21,7 +21,7 @@
 		<PackageProjectUrl>https://github.com/masesgroup/DDMChat/</PackageProjectUrl>
 		<PackageIconUrl>https://masesgroup.github.io/DDMChat/images/icon.ico</PackageIconUrl>
 		<PackageReleaseNotes>https://github.com/masesgroup/DDMChat/releases</PackageReleaseNotes>
-		<PackageTags>chat bbc datadistributionmanager p2p</PackageTags>
+		<PackageTags>chat bbs JSON cryptography message p2p</PackageTags>
 		<RepositoryUrl>https://github.com/masesgroup/DDMChat</RepositoryUrl>
 		<Copyright>Copyright © 2021 S4I s.r.l.</Copyright>
 	</PropertyGroup>
