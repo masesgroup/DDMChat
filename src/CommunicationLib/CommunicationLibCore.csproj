@@ -36,7 +36,7 @@
 		<None Include="..\Common\Chat.snk" Link="Chat.snk" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DataDistributionManager" Version="1.1.2" />
+		<PackageReference Include="MASES.DataDistributionManager" Version="1.2.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="dds_tcp_conf.ini">
