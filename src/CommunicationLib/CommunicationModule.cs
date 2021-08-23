@@ -198,7 +198,7 @@ namespace MASES.S4I.CommunicationLib
                             Description = "Channel Start error"
                         };
                     }
-                    Channel.SeekChannel(0);
+                    Channel.SeekChannel(0, DDM_SEEKKIND.ABSOLUTE);
                 }
                 catch (Exception ex)
                 {
@@ -320,11 +320,11 @@ namespace MASES.S4I.CommunicationLib
             Status = new ExtendedStatus
             {
                 Status = StatusEnum.COMMUNICATION_ERROR,
-                Description = string.Format("Received event from {0} with ErrorCode {1} NativeCode {2} SubSystemReason {3}", e.ChannelName, e.ErrorCode, e.NativeCode, e.SubSystemReason)
+                Description = string.Format("Received event from {0} with ErrorCode {1} NativeCode {2} SubSystemReason {3}", e.ChannelInfo.ChannelName, e.ErrorCode, e.NativeCode, e.SubSystemReason)
             };
             if (!String.IsNullOrEmpty(LogFileName))
             {
-                File.AppendAllText(LogFileName, String.Format("Timestamp: {0} Received event from: {1} ErrorCode: {2} NativeCode: {3} SubSystemReason: {4} {5}", DateTime.Now, e.ChannelName, e.ErrorCode, e.NativeCode, e.SubSystemReason,  Environment.NewLine));
+                File.AppendAllText(LogFileName, String.Format("Timestamp: {0} Received event from: {1} ErrorCode: {2} NativeCode: {3} SubSystemReason: {4} {5}", DateTime.Now, e.ChannelInfo.ChannelName, e.ErrorCode, e.NativeCode, e.SubSystemReason,  Environment.NewLine));
             }
         }
 
